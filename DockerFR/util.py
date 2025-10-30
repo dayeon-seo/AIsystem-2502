@@ -61,8 +61,8 @@ def calculate_face_similarity(image_a: Any, image_b: Any) -> float:
 
     This function should:
       1. Detect faces in both images.
-      2. Optionally align faces using keypoints and homography warping.
-      3. Run anti-spoofing checks to validate face authenticity.
+      2. Align faces using keypoints and homography warping.
+      3. (Run anti-spoofing checks to validate face authenticity. - If you want)
       4. Generate embeddings and compute a similarity score.
 
     The images provided by the API arrive as raw byte strings; convert or decode

@@ -31,7 +31,8 @@ Swagger UI is automatically generated at `http://localhost:5003/docs` (ReDoc at 
 
 ### Submission Guidelines
 - Project due date: **November 16**.
-- Submit your work via a Git pull request named `submit_<studentID>_<name>` (for example, `submit_20230001_AlexKim`).
+- Submit your work by
+  - Fork the repository, and give me the private repo by the mail (yjyoo3312@cau.ac.kr). You should mention your student ID and name.
   - In our final project, you should do port-forwarding to give me the api.
 - You can use pre-trained detectors, embedding neural network model, and keypoint detection model. But, you should not use entire face recognition library such as mediapipe.
 
