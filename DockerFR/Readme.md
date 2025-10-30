@@ -26,9 +26,13 @@ Swagger UI is automatically generated at `http://localhost:5003/docs` (ReDoc at 
 - Face embedding: Transform each aligned face into a 512-dimensional feature vector using the RetinaFace embedding model.
 - Similarity scoring: Compare the two embeddings with cosine similarity to obtain the final match score.
 
+[1] https://github.com/deepinsight/insightface/tree/master/model_zoo
+[2] https://github.com/serengil/retinaface?tab=readme-ov-file
+
 ### Submission Guidelines
 - Project due date: **November 16**.
 - Submit your work via a Git pull request named `submit_<studentID>_<name>` (for example, `submit_20230001_AlexKim`).
+  - In our final project, you should do port-forwarding to give me the api.
 - You can use pre-trained detectors, embedding neural network model, and keypoint detection model. But, you should not use entire face recognition library such as mediapipe.
 
 ## Basic Docker Workflow
