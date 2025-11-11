@@ -7,7 +7,7 @@ fill in the logic as part of the coursework.
 
 from typing import Any, List
 
-
+# 테스트
 def detect_faces(image: Any) -> List[Any]:
     """
     Detect faces within the provided image.
