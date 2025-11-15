@@ -2,3 +2,10 @@ fastapi
 pydantic
 uvicorn[standard]
 python-multipart
+numpy
+Pillow
+insightface
+onnxruntime
+onnxruntime-tools
+scipy
+opencv-python-headless
