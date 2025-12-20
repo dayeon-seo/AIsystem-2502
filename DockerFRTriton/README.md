@@ -1,4 +1,4 @@
----
+
 ## 도커 실행 관련
 - 노트북이라 계속 켜둘 수가 없어서 레포지토리와 리드미 설명으로 제출합니다.
 1. Build the Docker image:
@@ -18,7 +18,7 @@
 
 
 
----
+
 # DockerFRTriton
 
 Serve a face-recognition (FR) system on Triton Inference Server (CPU) with a FastAPI wrapper. Students must export models to ONNX, build a Triton-ready model repository, and keep all inference on Triton (FR backbone, detector, and any future alignment/spoofing).
