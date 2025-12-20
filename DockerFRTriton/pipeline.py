@@ -15,15 +15,13 @@ def _cosine_similarity(vec_a: np.ndarray, vec_b: np.ndarray) -> float:
 
 
 def get_embeddings(client: Any, image_a: bytes, image_b: bytes) -> Tuple[np.ndarray, np.ndarray]:
-    """
-    Call Triton twice to obtain embeddings for two images.
+    _ = run_inference(client, image_a, model_name="face_detector")
+    _ = run_inference(client, image_b, model_name="face_detector")
 
-    Extend this by adding detection/alignment/antispoof when those Triton models
-    are available in the repository. For now we assume inputs are already aligned.
-    """
-    emb_a = run_inference(client, image_a)
-    emb_b = run_inference(client, image_b)
-    return emb_a.squeeze(0), emb_b.squeeze(0)
+    emb_a = run_inference(client, image_a, model_name="fr_model")
+    emb_b = run_inference(client, image_b, model_name="fr_model")
+    
+    return emb_a.squeeze(), emb_b.squeeze()
 
 
 def calculate_face_similarity(client: Any, image_a: bytes, image_b: bytes) -> float:

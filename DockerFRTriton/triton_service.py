@@ -18,48 +18,35 @@ MODEL_IMAGE_SIZE = (112, 112)
 
 
 def prepare_model_repository(model_repo: Path) -> None:
-    """
-    Populate the Triton model repository with the FR ONNX model and config.pbtxt.
-    """
-    model_dir = model_repo / MODEL_NAME / MODEL_VERSION
-    model_path = model_dir / "model.onnx"
-    config_path = model_dir.parent / "config.pbtxt"
-
-    if not model_path.exists():
-        raise FileNotFoundError(
-            f"Missing ONNX model at {model_path}. "
-            "Run convert_to_onnx.py first or place your exported model there."
-        )
-
-    model_dir.mkdir(parents=True, exist_ok=True)
-    config_text = textwrap.dedent(
-        f"""
-        name: "{MODEL_NAME}"
+    fr_dir = model_repo / "fr_model" / "1"
+    fr_dir.mkdir(parents=True, exist_ok=True)
+    fr_config_path = model_repo / "fr_model" / "config.pbtxt"
+    
+    fr_config = textwrap.dedent(f"""
+        name: "fr_model"
         platform: "onnxruntime_onnx"
-        max_batch_size: 8
-        default_model_filename: "model.onnx"
-        input [
-          {{
-            name: "{MODEL_INPUT_NAME}"
-            data_type: TYPE_FP32
-            dims: [3, {MODEL_IMAGE_SIZE[0]}, {MODEL_IMAGE_SIZE[1]}]
-          }}
-        ]
-        output [
-          {{
-            name: "{MODEL_OUTPUT_NAME}"
-            data_type: TYPE_FP32
-            dims: [512]
-          }}
-        ]
-        instance_group [
-          {{ kind: KIND_CPU }}
-        ]
-        """
-    ).strip() + "\n"
+        max_batch_size: 0
+        input [ {{ name: "input.1", data_type: TYPE_FP32, dims: [1, 3, 112, 112] }} ]
+        output [ {{ name: "516", data_type: TYPE_FP32, dims: [1, 512] }} ]
+        instance_group [ {{ kind: KIND_CPU }} ]
+    """).strip()
+    fr_config_path.write_text(fr_config)
 
-    config_path.write_text(config_text)
-    print(f"[triton] Prepared model repository at {model_dir.parent}")
+    det_dir = model_repo / "face_detector" / "1"
+    det_dir.mkdir(parents=True, exist_ok=True)
+    det_config_path = model_repo / "face_detector" / "config.pbtxt"
+    
+    det_config = textwrap.dedent(f"""
+        name: "face_detector"
+        platform: "onnxruntime_onnx"
+        max_batch_size: 0
+        input [ {{ name: "input.1", data_type: TYPE_FP32, dims: [1, 3, 640, 640] }} ]
+        output [ {{ name: "443", data_type: TYPE_FP32, dims: [12800, 1] }} ]
+        instance_group [ {{ kind: KIND_CPU }} ]
+    """).strip()
+    det_config_path.write_text(det_config)
+    
+    print("[triton] Both model configs prepared!")
 
 
 def start_triton_server(model_repo: Path) -> Any:
@@ -118,27 +105,35 @@ def create_triton_client(url: str) -> Any:
     return client
 
 
-def run_inference(client: Any, image_bytes: bytes) -> Any:
-    """
-    Preprocess an input image, call Triton, and decode embeddings or scores.
-    """
+def run_inference(client: Any, image_bytes: bytes, model_name: str = "fr_model") -> Any:
     try:
         from io import BytesIO
         from PIL import Image
         from tritonclient import http as httpclient
-    except ImportError as exc:  # pragma: no cover - defensive
-        raise RuntimeError("Pillow, numpy, and tritonclient[http] are required to run inference.") from exc
+    except ImportError as exc:
+        raise RuntimeError("Pillow, numpy, and tritonclient[http] are required.") from exc
+
+    if model_name == "face_detector":
+        input_name = "input.1"
+        output_name = "443"
+        image_size = (640, 640)
+    else: 
+        input_name = "input.1"
+        output_name = "516"
+        image_size = (112, 112)
 
     with Image.open(BytesIO(image_bytes)) as img:
-        img = img.convert("RGB").resize(MODEL_IMAGE_SIZE)
+        img = img.convert("RGB").resize(image_size) 
         np_img = np.asarray(img, dtype=np.float32) / 255.0
 
-    np_img = np.transpose(np_img, (2, 0, 1))  # HWC -> CHW
+    np_img = np.transpose(np_img, (2, 0, 1)) 
     batch = np.expand_dims(np_img, axis=0)
 
-    infer_input = httpclient.InferInput(MODEL_INPUT_NAME, batch.shape, "FP32")
+    infer_input = httpclient.InferInput(input_name, batch.shape, "FP32")
     infer_input.set_data_from_numpy(batch)
 
-    infer_output = httpclient.InferRequestedOutput(MODEL_OUTPUT_NAME)
-    response = client.infer(model_name=MODEL_NAME, inputs=[infer_input], outputs=[infer_output])
-    return response.as_numpy(MODEL_OUTPUT_NAME)
+    infer_output = httpclient.InferRequestedOutput(output_name)
+    
+    response = client.infer(model_name=model_name, inputs=[infer_input], outputs=[infer_output])
+    
+    return response.as_numpy(output_name)
