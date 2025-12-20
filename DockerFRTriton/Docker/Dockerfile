@@ -1,4 +1,5 @@
 FROM nvcr.io/nvidia/tritonserver:23.10-py3
+SHELL ["/bin/bash", "-c"]
 
 # Workdir inside container
 WORKDIR /app

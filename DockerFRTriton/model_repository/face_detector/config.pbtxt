@@ -1,0 +1,8 @@
+name: "face_detector"
+platform: "onnxruntime_onnx"
+max_batch_size: 0
+input [ { name: "input.1", data_type: TYPE_FP32, dims: [ 1, 3, 640, 640 ] } ]
+output [ 
+  { name: "443", data_type: TYPE_FP32, dims: [ 12800, 1 ] },
+  { name: "446", data_type: TYPE_FP32, dims: [ 12800, 4 ] }
+]
