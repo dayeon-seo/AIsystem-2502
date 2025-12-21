@@ -1,6 +1,8 @@
 
 ## 도커 실행 관련
 - 노트북이라 계속 켜둘 수가 없어서 레포지토리와 리드미 설명으로 제출합니다.
+0. Docker Desktop 실행.
+  
 1. Build the Docker image:
    docker build -t fr-triton -f Docker/Dockerfile .
 
